@@ -247,7 +247,6 @@ class GenerativeNetwork:
 
         for scale in range(self.nb_scales):
             x = self._upscale_block(x, scale + 1)
-
         scale = 2 ** self.nb_scales
         tv_regularizer = TVRegularizer(img_width=self.img_width * scale, img_height=self.img_height * scale,
                                        weight=self.tv_weight) #self.tv_weight)
@@ -256,7 +255,6 @@ class GenerativeNetwork:
                           init=self.init, name='sr_res_conv_final')(x)
 
         x = Denormalize(name='sr_res_conv_denorm')(x)
-
         return x
 
     def _residual_block(self, ip, id):
@@ -404,17 +402,24 @@ class SRGANNetwork:
                                                            small_model=use_small_discriminator)
         self.vgg_network = VGGNetwork(large_width, large_height)
 
-        ip = Input(shape=(3, self.img_width, self.img_height), name='x_generator')
-        ip_gan = Input(shape=(3, large_width, large_height), name='x_discriminator') # Actual X images
-        ip_vgg = Input(shape=(3, large_width, large_height), name='x_vgg') # Actual X images
+        #ip = Input(shape=(3, self.img_width, self.img_height), name='x_generator')
+        #ip_gan = Input(shape=(3, large_width, large_height), name='x_discriminator') # Actual X images
+        #ip_vgg = Input(shape=(3, large_width, large_height), name='x_vgg') # Actual X images
+        ip = Input(shape=(self.img_width, self.img_height, 3), name='x_generator')
+        ip_gan = Input(shape=(large_width, large_height, 3), name='x_discriminator') # Actual X images
+        ip_vgg = Input(shape=(large_width, large_height, 3), name='x_vgg') # Actual X images
 
         sr_output = self.generative_network.create_sr_model(ip)
         self.generative_model_ = Model(ip, sr_output)
+        #print self.generative_model_.summary()
 
         gan_output = self.discriminative_network.append_gan_network(ip_gan)
         self.discriminative_model_ = Model(ip_gan, gan_output)
+        print self.discriminative_model_.summary()
 
         gan_output = self.discriminative_model_(self.generative_model_.output)
+     
+        print "gan_output {} ip_vgg {}".format(self.generative_model_.output, ip_vgg)
         vgg_output = self.vgg_network.append_vgg_network(self.generative_model_.output, ip_vgg)
 
         self.srgan_model_ = Model(input=[ip, ip_gan, ip_vgg], output=[gan_output, vgg_output])
@@ -761,7 +766,7 @@ if __name__ == "__main__":
     from keras.utils.visualize_util import plot
 
     # Path to MS COCO dataset
-    coco_path = r"D:\Yue\Documents\Dataset\coco2014\train2014"
+    coco_path = r"/home/harp/SaveData/Leo/SRGAN/data/"
 
     '''
     Base Network manager for the SRGAN model

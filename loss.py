@@ -88,6 +88,8 @@ class TVRegularizer(ActivityRegularizer):
             a = K.square(x[:, :, :self.img_width - 1, :self.img_height - 1] - x[:, :, 1:, :self.img_height - 1])
             b = K.square(x[:, :, :self.img_width - 1, :self.img_height - 1] - x[:, :, :self.img_width - 1, 1:])
         else:
+            #print "width {} height{} ".format(self.img_width, self.img_height)
+            #print "x shape {} {}".format(x.shape[0], x.shape[1])
             a = K.square(x[:, :self.img_width - 1, :self.img_height - 1, :] - x[:, 1:, :self.img_height - 1, :])
             b = K.square(x[:, :self.img_width - 1, :self.img_height - 1, :] - x[:, :self.img_width - 1, 1:, :])
         loss = self.weight * K.mean(K.sum(K.pow(a + b, 1.25)))
