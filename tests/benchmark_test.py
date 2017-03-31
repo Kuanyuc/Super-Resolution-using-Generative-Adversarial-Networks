@@ -32,7 +32,7 @@ if not os.path.exists(base_val_images_path):
 if not os.path.exists(base_test_images):
     os.makedirs(base_test_images)
 
-def test_set5(model : Model, img_width=32, img_height=32, batch_size=1):
+def test_set5(model:Model, img_width=32, img_height=32, batch_size=1):
     datagen = ImageDataGenerator(rescale=1. / 255)
     large_img_width = img_width * 4
     large_img_height = img_height * 4
@@ -290,15 +290,15 @@ class SRResNetTest:
 if __name__ == "__main__":
     from keras.utils.visualize_util import plot
 
-    coco_path = r"D:\Yue\Documents\Dataset\coco2014\train2014"
+    coco_path = r"./data"
 
     img_width = img_height = 64
 
     sr_resnet_test = SRResNetTest(img_width=img_width, img_height=img_height, batch_size=1)
-    sr_resnet_test.build_model(load_weights=False)
+    sr_resnet_test.build_model(load_weights=True)
     #plot(sr_resnet_test.model, to_file='sr_resnet.png', show_shapes=True)
 
-    sr_resnet_test.train_model(coco_path, nb_images=50000, nb_epochs=1)
+    # sr_resnet_test.train_model(coco_path, nb_images=50000, nb_epochs=1)
 
     test_set5(sr_resnet_test.model, img_width=img_width, img_height=img_height)
     test_set14(sr_resnet_test.model, img_width=img_width, img_height=img_height)

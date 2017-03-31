@@ -30,9 +30,15 @@ if not os.path.exists("val_images/"):
     os.makedirs("val_images/")
 
 if K.image_dim_ordering() == "th":
+    # make sure it channel is 1st !!! by setting image_dim_ordering in keras.json
+    print 'K.image_dim_ordering() == "th":'
     channel_axis = 1
 else:
+    # if is "tf", then mannually set dim ordering
+    print 'K.image_dim_ordering():', K.image_dim_ordering()
     channel_axis = -1
+    # K.set_image_data_format('channels_first')
+    print 'K.image_data_format():', K.image_data_format()
 
 class VGGNetwork:
     '''
@@ -774,7 +780,7 @@ if __name__ == "__main__":
 
     srgan_network = SRGANNetwork(img_width=32, img_height=32, batch_size=1)
     srgan_network.build_srgan_model()
-    #plot(srgan_network.srgan_model_, 'SRGAN.png', show_shapes=True)
+    plot(srgan_network.srgan_model_, 'SRGAN.png', show_shapes=True)
 
     # Pretrain the SRGAN network
     #srgan_network.pre_train_srgan(coco_path, nb_images=80000, nb_epochs=1)
@@ -782,8 +788,8 @@ if __name__ == "__main__":
     # Pretrain the discriminator network
     #srgan_network.pre_train_discriminator(coco_path, nb_images=40000, nb_epochs=1, batch_size=16)
 
-    # Fully train the SRGAN with VGG loss and Discriminator loss
-    srgan_network.train_full_model(coco_path, nb_images=80000, nb_epochs=5)
+    # # Fully train the SRGAN with VGG loss and Discriminator loss
+    # srgan_network.train_full_model(coco_path, nb_images=80000, nb_epochs=5)
 
 
 

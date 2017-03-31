@@ -1,0 +1,9 @@
+# data
+data/
+tests/bsd100/bsd100/
+tests/set14/Set14/
+tests/set5/Set5/
+
+# python
+*.pyc
+./**/*.pyc
