@@ -333,8 +333,8 @@ class SRGANNetwork:
                                                     use_small_srgan)
         self.vgg_network = VGGNetwork(large_width, large_height)
 
-        ip = Input(shape=(3, self.img_width, self.img_height), name='x_generator')
-        ip_vgg = Input(shape=(3, large_width, large_height), name='x_vgg')  # Actual X images
+        ip = Input(shape=(self.img_width, self.img_height, 3), name='x_generator')
+        ip_vgg = Input(shape=(large_width, large_height, 3), name='x_vgg')  # Actual X images
 
         sr_output = self.generative_network.create_sr_model(ip)
         self.generative_model_ = Model(ip, sr_output)
@@ -364,8 +364,8 @@ class SRGANNetwork:
         self.discriminative_network = DiscriminatorNetwork(large_width, large_height,
                                                            small_model=use_small_discriminator)
 
-        ip = Input(shape=(3, self.img_width, self.img_height), name='x_generator')
-        ip_gan = Input(shape=(3, large_width, large_height), name='x_discriminator')  # Actual X images
+        ip = Input(shape=(self.img_width, self.img_height, 3), name='x_generator')
+        ip_gan = Input(shape=(large_width, large_height, 3), name='x_discriminator')  # Actual X images
 
         sr_output = self.generative_network.create_sr_model(ip)
         self.generative_model_ = Model(ip, sr_output)
@@ -468,6 +468,7 @@ class SRGANNetwork:
 
         if load_generative_weights:
             try:
+                print "try to load generative weight {}".format(self.generative_network.sr_weights_path)
                 self.generative_model_.load_weights(self.generative_network.sr_weights_path)
                 print("Generator weights loaded.")
             except:
@@ -475,6 +476,7 @@ class SRGANNetwork:
 
         if load_discriminator_weights:
             try:
+                print "try to load dicriminator weight {}".format(self.srgan_model_)
                 self.discriminative_network.load_gan_weights(self.srgan_model_)
                 print("Discriminator weights loaded.")
             except:
@@ -501,13 +503,13 @@ class SRGANNetwork:
                                 'generator_loss' : [],
                                 'val_psnr': [], }
 
-        y_vgg_dummy = np.zeros((self.batch_size * 2, 3, img_width // 32, img_height // 32)) # 5 Max Pools = 2 ** 5 = 32
+        y_vgg_dummy = np.zeros((self.batch_size * 2, img_width // 32, img_height // 32, 3)) # 5 Max Pools = 2 ** 5 = 32
 
         print("Training SRGAN network")
         for i in range(nb_epochs):
             print()
             print("Epoch : %d" % (i + 1))
-
+            print "image directory {} img_width {} img_height {}".format(image_dir, img_width, img_height)
             for x in datagen.flow_from_directory(image_dir, class_mode=None, batch_size=self.batch_size,
                                                  target_size=(img_width, img_height)):
                 try:
@@ -527,7 +529,7 @@ class SRGANNetwork:
                         img = imresize(img, (self.img_width, self.img_height), interp='bicubic')
                         x_generator[j, :, :, :] = img
 
-                    x_generator = x_generator.transpose((0, 3, 1, 2))
+                    x_generator = x_generator.transpose((0, 1, 2, 3))
 
                     if iteration % 50 == 0 and iteration != 0 and not pre_train_discriminator:
                         print("Validation image..")
@@ -564,11 +566,11 @@ class SRGANNetwork:
                                                                                                         x_i + 1)
 
                             val_x = x[x_i].copy() * 255.
-                            val_x = val_x.transpose((1, 2, 0))
+                            #val_x = val_x.transpose((1, 2, 0))
                             val_x = np.clip(val_x, 0, 255).astype('uint8')
 
                             output_image = output_image_batch[x_i]
-                            output_image = output_image.transpose((1, 2, 0))
+                            #output_image = output_image.transpose((1, 2, 0))
                             output_image = np.clip(output_image, 0, 255).astype('uint8')
 
                             imsave(real_path, val_x)
@@ -782,13 +784,13 @@ if __name__ == "__main__":
     #plot(srgan_network.srgan_model_, 'SRGAN.png', show_shapes=True)
 
     # Pretrain the SRGAN network
-    #srgan_network.pre_train_srgan(coco_path, nb_images=80000, nb_epochs=1)
+    srgan_network.pre_train_srgan(coco_path, nb_images=80000, nb_epochs=1)
 
     # Pretrain the discriminator network
     #srgan_network.pre_train_discriminator(coco_path, nb_images=40000, nb_epochs=1, batch_size=16)
 
     # Fully train the SRGAN with VGG loss and Discriminator loss
-    srgan_network.train_full_model(coco_path, nb_images=80000, nb_epochs=5)
+    #srgan_network.train_full_model(coco_path, nb_images=80000, nb_epochs=5)
 
 
 
