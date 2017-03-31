@@ -32,7 +32,7 @@ if not os.path.exists(base_val_images_path):
 if not os.path.exists(base_test_images):
     os.makedirs(base_test_images)
 
-def test_set5(model:Model, img_width=32, img_height=32, batch_size=1):
+def test_set5(model, img_width=32, img_height=32, batch_size=1):
     datagen = ImageDataGenerator(rescale=1. / 255)
     large_img_width = img_width * 4
     large_img_height = img_height * 4
@@ -48,7 +48,7 @@ def test_set5(model:Model, img_width=32, img_height=32, batch_size=1):
     print()
 
 
-def test_set14(model : Model, img_width=32, img_height=32, batch_size=1):
+def test_set14(model, img_width=32, img_height=32, batch_size=1):
     datagen = ImageDataGenerator(rescale=1. / 255)
     large_img_width = img_width * 4
     large_img_height = img_height * 4
@@ -63,7 +63,7 @@ def test_set14(model : Model, img_width=32, img_height=32, batch_size=1):
     print("Average PSNR of Set5 validation images : ", total_psnr / 14)
     print()
 
-def test_bsd100(model : Model, img_width=32, img_height=32, batch_size=1):
+def test_bsd100(model, img_width=32, img_height=32, batch_size=1):
     datagen = ImageDataGenerator(rescale=1. / 255)
     large_img_width = img_width * 4
     large_img_height = img_height * 4
@@ -145,7 +145,7 @@ class SRResNetTest:
         self.model = None # type: Model
         self.weights_path = base_weights_path + "sr_resnet_weights.h5"
 
-    def build_model(self, load_weights=False) -> Model:
+    def build_model(self, load_weights=False):
         sr_resnet = models.GenerativeNetwork(self.img_width, self.img_height, self.batch_size)
 
         ip = Input(shape=(3, self.img_width, self.img_height), name='x_generator')
@@ -163,7 +163,7 @@ class SRResNetTest:
             except Exception:
                 print("Weight for SR ResNet model not found or are incorrect size. Cannot load weights.")
 
-                response = input("Continue without loading weights? 'y' or 'n' ")
+                response = raw_input("Continue without loading weights? 'y' or 'n' ")
                 if response == 'n':
                     exit()
 
