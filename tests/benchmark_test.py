@@ -87,6 +87,7 @@ def _test_loop(path, batch_size, datagen, img_height, img_width, iteration, larg
 
         # resize images
         x_temp = x.copy()
+        
         x_temp = x_temp.transpose((0, 2, 3, 1))
 
         x_generator = np.empty((batch_size, img_width, img_height, 3))
@@ -97,7 +98,10 @@ def _test_loop(path, batch_size, datagen, img_height, img_width, iteration, larg
 
         x_generator = x_generator.transpose((0, 3, 1, 2))
 
+
         output_image_batch = model.predict_on_batch(x_generator)
+
+        # print "output_image_batch.shape: ", output_image_batch.shape
 
         average_psnr = 0.0
         for x_i in range(batch_size):
@@ -143,7 +147,8 @@ class SRResNetTest:
         self.batch_size = batch_size
 
         self.model = None # type: Model
-        self.weights_path = base_weights_path + "sr_resnet_weights.h5"
+        # self.weights_path = base_weights_path + "sr_resnet_weights.h5"
+        self.weights_path = "../weights/SRGAN.h5"
 
     def build_model(self, load_weights=False):
         sr_resnet = models.GenerativeNetwork(self.img_width, self.img_height, self.batch_size)
