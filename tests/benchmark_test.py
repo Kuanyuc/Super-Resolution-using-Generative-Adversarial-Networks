@@ -158,7 +158,8 @@ class SRResNetTest:
 
         if load_weights:
             try:
-                self.model.load_weights(self.weights_path)
+                print "os.path.exists(self.weights_path):", os.path.exists(self.weights_path)
+                self.model.load_weights(self.weights_path, by_name=True)
                 print("SR ResNet model weights loaded.")
             except Exception:
                 print("Weight for SR ResNet model not found or are incorrect size. Cannot load weights.")
@@ -296,7 +297,7 @@ if __name__ == "__main__":
 
     sr_resnet_test = SRResNetTest(img_width=img_width, img_height=img_height, batch_size=1)
     sr_resnet_test.build_model(load_weights=True)
-    #plot(sr_resnet_test.model, to_file='sr_resnet.png', show_shapes=True)
+    plot(sr_resnet_test.model, to_file='sr_resnet.png', show_shapes=True)
 
     # sr_resnet_test.train_model(coco_path, nb_images=50000, nb_epochs=1)
 
